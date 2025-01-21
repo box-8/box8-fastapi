@@ -80,21 +80,21 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.middleware("http")
 async def extend_session_middleware(request: Request, call_next):
-    print(f"[Middleware] Request path: {request.url.path}")
-    print(f"[Middleware] Request cookies: {request.cookies}")
+    #print(f"[Middleware] Request path: {request.url.path}")
+    #print(f"[Middleware] Request cookies: {request.cookies}")
     
     response = await call_next(request)
     
     # Récupérer le cookie de session
     session = request.cookies.get("session")
     if session:
-        print(f"[Middleware] Found session cookie")
+        #print(f"[Middleware] Found session cookie")
         # Créer un nouveau token avec une durée prolongée
         try:
             # Vérifier si l'utilisateur est valide
             user = await get_current_user(session)
             if user:
-                print(f"[Middleware] Valid user found: {user['email']}")
+                #print(f"[Middleware] Valid user found: {user['email']}")
                 access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
                 access_token = create_access_token(
                     data={"sub": user["email"]},
@@ -103,7 +103,7 @@ async def extend_session_middleware(request: Request, call_next):
                 
                 # Utiliser la fonction utilitaire pour mettre à jour le cookie
                 set_session_cookie(response, access_token)
-                print(f"[Middleware] Session extended for user: {user['email']}")
+                #print(f"[Middleware] Session extended for user: {user['email']}")
         except Exception as e:
             print(f"[Middleware] Error extending session: {str(e)}")
             # Si le token est invalide, on ne fait rien
